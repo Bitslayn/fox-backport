@@ -2,6 +2,7 @@ package bitslayn.backport;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import org.figuramc.figura.gui.widgets.lists.PlayerList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,6 +19,6 @@ public final class FoxBackportMod {
     @SuppressWarnings("unused")
     private static void bumpClasses() {
         // make mixin wake up and do the work ON THREAD
-//        Class<Keyframe> keyframeClass = Keyframe.class;
+        Class<PlayerList> playerListClass = PlayerList.class;
     }
 }
