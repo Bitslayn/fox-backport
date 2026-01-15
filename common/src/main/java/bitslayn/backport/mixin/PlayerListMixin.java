@@ -1,7 +1,5 @@
 package bitslayn.backport.mixin;
 
-import com.llamalad7.mixinextras.expression.Definition;
-import com.llamalad7.mixinextras.expression.Expression;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import org.figuramc.figura.avatar.Avatar;
@@ -49,10 +47,12 @@ public class PlayerListMixin {
                     )
             )
     )
-    private boolean foxbackport$modifyContinue(boolean original, @Local(name = "avatar") Avatar avatar, @Local(name="id") UUID id) {
+    private boolean foxbackport$modifyContinue(boolean original,
+                                               @Local(name = "avatar") Avatar avatar,
+                                               @Local(name = "id") UUID id) {
         return original || (
                 !avatar.entityName.toLowerCase(Locale.US).contains(filter.toLowerCase(Locale.US))
-                && !id.toString().contains(filter.toLowerCase(Locale.US))
+                        && !id.toString().contains(filter.toLowerCase(Locale.US))
         );
     }
 }
