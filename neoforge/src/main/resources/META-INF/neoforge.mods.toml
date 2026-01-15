@@ -1,0 +1,40 @@
+modLoader = "javafml"
+loaderVersion = "[1,)"
+#issueTrackerURL = ""
+license = "MIT"
+
+[[mods]]
+modId = "foxbackport"
+version = "${version}"
+displayName = "FOXBackport"
+authors = ""
+displayTest = "IGNORE_ALL_VERSION"
+description = '''
+
+'''
+#logoFile = ""
+
+[[dependencies.foxbackport]]
+modId = "neoforge"
+mandatory = true
+versionRange = "${neoforge_range}"
+ordering = "NONE"
+side = "CLIENT"
+
+[[dependencies.foxbackport]]
+modId = "minecraft"
+mandatory = true
+versionRange = "${minecraft_range_forge}"
+ordering = "NONE"
+side = "CLIENT"
+
+[[dependencies.foxbackport]]
+modId = "figura"
+mandatory = true
+versionRange = "0.1.5,0.1.5b"
+ordering = "NONE"
+side = "CLIENT"
+
+
+[[mixins]]
+config = "foxbackport.mixins.json"

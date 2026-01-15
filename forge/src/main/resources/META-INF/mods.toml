@@ -1,0 +1,36 @@
+modLoader = "javafml"
+loaderVersion = "[${forge_minimum},${forge_maximum})"
+#issueTrackerURL = ""
+license = "MIT"
+
+[[mods]]
+modId = "foxbackport"
+version = "${version}"
+displayName = "FOXBackport"
+authors = ""
+displayTest = "IGNORE_ALL_VERSION"
+description = '''
+
+'''
+#logoFile = ""
+
+[[dependencies.foxbackport]]
+modId = "forge"
+mandatory = true
+versionRange = "[${forge_minimum},)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.foxbackport]]
+modId = "minecraft"
+mandatory = true
+versionRange = "${minecraft_range_forge}"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.foxbackport]]
+modId = "figura"
+mandatory = true
+versionRange = "0.1.5,0.1.5b"
+ordering = "NONE"
+side = "CLIENT"

@@ -1,0 +1,62 @@
+plugins {
+    id 'com.github.johnrengelman.shadow'
+}
+
+loom {
+    forge {
+        mixinConfig "foxbackport.mixins.json"
+    }
+}
+
+architectury {
+    platformSetupLoomIde()
+    forge()
+}
+
+configurations {
+    common
+    shadowCommon
+    compileClasspath.extendsFrom common
+    runtimeClasspath.extendsFrom common
+    developmentForge.extendsFrom common
+}
+
+dependencies {
+    forge "net.minecraftforge:forge:$minecraft_version-$forge_version"
+
+    // Figura
+    modImplementation "org.figuramc:figura-forge:$figura+$minecraft_version"
+
+    forgeRuntimeLibrary(modImplementation("com.github.FiguraMC.luaj:luaj-core:$luaj-figura"))
+    forgeRuntimeLibrary(modImplementation("com.github.FiguraMC.luaj:luaj-jse:$luaj-figura"))
+    forgeRuntimeLibrary(modImplementation("com.neovisionaries:nv-websocket-client:$nv_websocket"))
+
+    compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:$mixinextras"))
+    implementation(include("io.github.llamalad7:mixinextras-forge:$mixinextras"))
+
+    common(project(path: ':common', configuration: 'namedElements')) { transitive false }
+    shadowCommon(project(path: ':common', configuration: 'transformProductionForge')) { transitive false }
+}
+
+processResources {
+    Map<String, Object> injectProperties = new HashMap<>()
+
+    injectProperties.put 'version', project.version
+    injectProperties.put 'minecraft_range_forge', minecraft_range_forge
+    injectProperties.put 'forge_minimum', forge_minimum
+    injectProperties.put 'forge_maximum', forge_maximum
+    injectProperties.forEach { k, v -> inputs.property(k.toString(), v.toString()) }
+
+    filesMatching('META-INF/mods.toml') {
+        expand injectProperties
+    }
+}
+
+shadowJar {
+    configurations = [project.configurations.shadowCommon]
+    archiveClassifier = 'dev-shadow'
+}
+
+remapJar {
+    inputFile.set shadowJar.archiveFile
+}

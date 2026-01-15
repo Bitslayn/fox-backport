@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "package": "bitslayn.backport.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "minVersion": "0.8",
+  "client": [
+  ],
+  "mixinextras": {
+    "minVersion": "0.5.0"
+  },
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

@@ -1,0 +1,16 @@
+architectury {
+    common enabled_platforms.split(',')
+}
+
+def figura_attach = (figura_is_snapshot == "True") ? "-SNAPSHOT" : ""
+
+dependencies {
+    // We depend on Fabric Loader here to use the Fabric @Environment annotations,
+    // which get remapped to the correct annotations on each platform.
+    // Do NOT use other classes from Fabric Loader.
+    modImplementation "net.fabricmc:fabric-loader:$fabric_loader_version"
+    modCompileOnly "org.figuramc:figura-common-mojmap:$figura+$minecraft_version$figura_attach"
+    implementation "com.github.FiguraMC.luaj:luaj-core:$luaj-figura"
+
+    implementation(annotationProcessor("io.github.llamalad7:mixinextras-common:$mixinextras"))
+}

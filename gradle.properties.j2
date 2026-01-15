@@ -1,0 +1,34 @@
+# COMBINATIONS
+# version	fapi	forge
+# 1.19.2	0.77.0	43.5.1
+# 1.20.1	0.86.1	47.2.5
+
+# Done to increase the memory available to Gradle.
+org.gradle.jvmargs=-Xmx4G
+org.gradle.parallel=true
+org.gradle.caching=true
+# Mod properties
+mod_version={{ version }}{{ label }}
+maven_group=bitslayn
+archives_name=fox-backport
+enabled_platforms={{ platforms }}
+is_fabric={{ is_fabric }}
+is_forge={{ is_forge }}
+is_neo={{ is_neo }}
+# Minecraft properties
+minecraft_version={{ minecraft_target }}
+minecraft_range_fabric={{ fabric_range }}
+minecraft_range_forge={{ forge_range }}
+# Dependencies
+figura=0.1.5
+figura_is_snapshot={{ figura_is_snapshot }}
+fabric_loader_version=0.15.10
+fabric_api_version={{ fabric_api }}
+forge_version={{ forge }}
+forge_minimum={{ forge_min }}
+forge_maximum={{ forge_max }}
+neoforge_version={{ neoforge }}
+neoforge_range={{ neoforge_range }}
+luaj=3.0.8
+nv_websocket=2.14
+mixinextras=0.5.0

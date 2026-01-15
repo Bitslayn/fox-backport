@@ -1,0 +1,58 @@
+plugins {
+    id 'com.github.johnrengelman.shadow'
+}
+
+architectury {
+    platformSetupLoomIde()
+    neoForge()
+}
+
+configurations {
+    common
+    shadowCommon
+    compileClasspath.extendsFrom common
+    runtimeClasspath.extendsFrom common
+    developmentForge.extendsFrom common
+}
+
+dependencies {
+    neoForge "net.neoforged:neoforge:$neoforge_version"
+
+    // Figura
+    modImplementation "org.figuramc:figura-neoforge:$figura+$minecraft_version"
+
+    forgeRuntimeLibrary(modLocalRuntime("com.github.FiguraMC.luaj:luaj-core:$luaj-figura"))
+    forgeRuntimeLibrary(modLocalRuntime("com.github.FiguraMC.luaj:luaj-jse:$luaj-figura"))
+    forgeRuntimeLibrary(modLocalRuntime("com.neovisionaries:nv-websocket-client:$nv_websocket"))
+
+    compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:$mixinextras"))
+    implementation(include("io.github.llamalad7:mixinextras-neoforge:$mixinextras"))
+
+    common(project(path: ':common', configuration: 'namedElements')) { transitive false }
+    shadowCommon(project(path: ':common', configuration: 'transformProductionNeoForge')) { transitive false }
+}
+
+processResources {
+    Map<String, Object> injectProperties = new HashMap<>()
+
+    injectProperties.put 'version', project.version
+    injectProperties.put 'minecraft_range_forge', minecraft_range_forge
+    injectProperties.put 'neoforge_range', neoforge_range
+    injectProperties.forEach { k, v -> inputs.property(k.toString(), v.toString()) }
+
+    Map<String, String> renames = new HashMap<>()
+    renames.put 'neoforge.mods.toml', 'mods.toml'
+
+    filesMatching('META-INF/*mods.toml') {
+        expand injectProperties
+    }
+}
+
+shadowJar {
+    configurations = [project.configurations.shadowCommon]
+    archiveClassifier = 'dev-shadow'
+}
+
+remapJar {
+    inputFile.set shadowJar.archiveFile
+}
