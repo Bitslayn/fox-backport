@@ -1,6 +1,7 @@
 package bitslayn.backport.mixin;
 
 import bitslayn.backport.duck.PopupMenuExt;
+import com.bawnorton.mixinsquared.TargetHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
@@ -23,8 +24,18 @@ public class MinecraftMixin {
     public Entity cameraEntity;
 
     @SuppressWarnings("resource")
-    @Inject(at = @At("RETURN"), method = "handleKeybinds")
-    private void foxbackport$handleKeybinds(CallbackInfo ci) {
+    @TargetHandler(
+            mixin = "org.figuramc.figura.mixin.MinecraftMixin",
+            name = "handleKeybinds"
+    )
+    @Inject(
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lorg/figuramc/figura/avatar/AvatarManager;getAvatarForPlayer(Ljava/util/UUID;)Lorg/figuramc/figura/avatar/Avatar;"
+            ),
+            method = "@MixinSquared:Handler"
+    )
+    private void handleKeybinds(CallbackInfo ci, CallbackInfo ci2) {
         if (Configs.POPUP_BUTTON.keyBind.isDown()) {
             if (!PopupMenu.hasEntity()) {
                 HitResult result = cameraEntity.pick(20d, 1f, false);

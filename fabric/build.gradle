@@ -35,6 +35,7 @@ dependencies {
     shadowCommon(project(path: ':common', configuration: 'transformProductionFabric')) { transitive false }
 
     include(implementation(annotationProcessor("io.github.llamalad7:mixinextras-fabric:$mixinextras")))
+    include(implementation(annotationProcessor("com.github.bawnorton.mixinsquared:mixinsquared-fabric:$mixinsquared")))
 }
 
 processResources {

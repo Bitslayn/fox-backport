@@ -13,4 +13,5 @@ dependencies {
     implementation "com.github.FiguraMC.luaj:luaj-core:$luaj-figura"
 
     implementation(annotationProcessor("io.github.llamalad7:mixinextras-common:$mixinextras"))
+    implementation(annotationProcessor("com.github.bawnorton.mixinsquared:mixinsquared-common:$mixinsquared"))
 }

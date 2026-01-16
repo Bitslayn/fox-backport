@@ -23,6 +23,7 @@ import org.figuramc.figura.math.vector.FiguraVec4;
 import org.figuramc.figura.permissions.PermissionManager;
 import org.figuramc.figura.permissions.PermissionPack;
 import org.figuramc.figura.permissions.Permissions;
+import org.figuramc.figura.utils.FiguraIdentifier;
 import org.figuramc.figura.utils.FiguraText;
 import org.figuramc.figura.utils.MathUtils;
 import org.spongepowered.asm.mixin.Mixin;
@@ -57,7 +58,7 @@ public abstract class PopupMenuMixin implements PopupMenuAccessor {
     @Definition(id = "of", method = "Ljava/util/List;of(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/util/List;", remap = false)
     @Expression("BUTTONS = @(of(?, ?, ?, ?))")
     @ModifyExpressionValue(method = "<clinit>", at = @At("MIXINEXTRAS:EXPRESSION"))
-    private static List<Pair<Component, Consumer<UUID>>> foxbackport$volumeButton(List<Pair<Component, Consumer<UUID>>> original) {
+    private static List<Pair<Component, Consumer<UUID>>> insertVolumeButton(List<Pair<Component, Consumer<UUID>>> original) {
         ArrayList<Pair<Component, Consumer<UUID>>> writable = new ArrayList<>(original);
         writable.add(Pair.of(
                 FiguraText.of("popup_menu.change_volume"), id -> {
@@ -78,7 +79,7 @@ public abstract class PopupMenuMixin implements PopupMenuAccessor {
     // it's easier to target the start of the method and copy the if statement
     // than inject after the if statement
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
-    private static void foxbackport$attribution(GuiGraphics gui, CallbackInfo ci) {
+    private static void attribution(GuiGraphics gui, CallbackInfo ci) {
         if (!isEnabled()) {
             ci.cancel();
             return;
@@ -109,7 +110,7 @@ public abstract class PopupMenuMixin implements PopupMenuAccessor {
     @Definition(id = "entity", field = "Lorg/figuramc/figura/gui/PopupMenu;entity:Lnet/minecraft/world/entity/Entity;")
     @Expression("entity == null")
     @ModifyExpressionValue(method = "render", at = @At("MIXINEXTRAS:EXPRESSION"))
-    private static boolean foxbackport$bypass1(boolean original) {
+    private static boolean bypass1(boolean original) {
         return false;
     }
 
@@ -118,7 +119,7 @@ public abstract class PopupMenuMixin implements PopupMenuAccessor {
             value = "INVOKE",
             target = "Lnet/minecraft/world/entity/Entity;getUUID()Ljava/util/UUID;"
     ))
-    private static UUID foxbackport$bypass2(Entity instance) {
+    private static UUID bypass2(Entity instance) {
         return id;
     }
 
@@ -131,7 +132,7 @@ public abstract class PopupMenuMixin implements PopupMenuAccessor {
                     ordinal = 0
             )
     )
-    private static FiguraVec4 foxbackport$position(FiguraVec4 value, @Local(name = "minecraft") Minecraft minecraft) {
+    private static FiguraVec4 positioning(FiguraVec4 value, @Local(name = "minecraft") Minecraft minecraft) {
         if (entity != null) {
             FiguraVec3 worldPos = FiguraVec3.fromVec3(entity.getPosition(minecraft.getFrameTime()));
             worldPos.add(0f, entity.getBbHeight() + 0.1f, 0f);
@@ -148,24 +149,40 @@ public abstract class PopupMenuMixin implements PopupMenuAccessor {
     @Definition(id = "getName", method = "Lnet/minecraft/world/entity/Entity;getName()Lnet/minecraft/network/chat/Component;")
     @Expression("entity.getName().?()")
     @ModifyExpressionValue(method = "render", at = @At("MIXINEXTRAS:EXPRESSION"))
-    private static MutableComponent foxbackport$altnName(MutableComponent original) {
+    private static MutableComponent alternateName(MutableComponent original) {
         Avatar avatar = AvatarManager.getAvatarForPlayer(id);
         return avatar != null ? Component.literal(avatar.entityName) : original;
     }
 
     // clean up
     @Inject(method = "run", at = @At("TAIL"), remap = false)
-    private static void foxbackport$clearSkull(CallbackInfo ci) {
+    private static void clearSkull(CallbackInfo ci) {
         skull = null;
     }
 
     @WrapMethod(method = "hasEntity", remap = false)
-    private static boolean foxbackport$hasEntity(Operation<Boolean> original) {
+    private static boolean hasEntity(Operation<Boolean> original) {
         return original.call() || skull != null;
     }
 
     @Inject(method = "setEntity", at = @At("TAIL"))
-    private static void foxbackport$setEntityInj(Entity entity, CallbackInfo ci) {
+    private static void setEntityInj(Entity entity, CallbackInfo ci) {
         skull = null;
+    }
+
+    @Definition(id = "BACKGROUND", field = "Lorg/figuramc/figura/gui/PopupMenu;BACKGROUND:Lorg/figuramc/figura/utils/FiguraIdentifier;")
+    @Expression("BACKGROUND = @(?)")
+    @ModifyExpressionValue(method = "<clinit>", at = @At("MIXINEXTRAS:EXPRESSION"))
+    private static FiguraIdentifier adjustBackground(FiguraIdentifier original) {
+        return new FiguraIdentifier("textures/gui/popup_2.png");
+    }
+
+    // @Redirect throws an error, which source code says "This should never happen"
+    // well it happened :shrug:
+    @Definition(id = "ICONS", field = "Lorg/figuramc/figura/gui/PopupMenu;ICONS:Lorg/figuramc/figura/utils/FiguraIdentifier;")
+    @Expression("ICONS = @(?)")
+    @ModifyExpressionValue(method = "<clinit>", at = @At("MIXINEXTRAS:EXPRESSION"))
+    private static FiguraIdentifier adjustIcons(FiguraIdentifier original) {
+        return new FiguraIdentifier("textures/gui/popup_icons_2.png");
     }
 }

@@ -30,24 +30,32 @@ subprojects {
         // See https://docs.gradle.org/current/userguide/declaring_repositories.html
         // for more information about repositories.
         maven {
-            name "Figura Releases"
-            url "https://maven.figuramc.org/releases"
+            name = "Figura Releases"
+            url = "https://maven.figuramc.org/releases"
         }
         maven {
-            name "Figura Snapshots"
-            url "https://maven.figuramc.org/snapshots"
+            name = "Figura Snapshots"
+            url = "https://maven.figuramc.org/snapshots"
         }
         maven {
-            name "Unofficial Figura Snapshots"
-            url "https://penguinencounter.github.io/mvn/snapshots"
+            name = "Unofficial Figura Snapshots"
+            url = "https://penguinencounter.github.io/mvn/snapshots"
         }
         maven {
-            name "Jitpack"
-            url "https://www.jitpack.io"
+            name = "Jitpack"
+            url = "https://www.jitpack.io"
         }
         maven {
-            name "NeoForge Releases"
-            url 'https://maven.neoforged.net/releases/'
+            name = "NeoForge Releases"
+            url = 'https://maven.neoforged.net/releases/'
+        }
+        maven {
+            name = "MixinSquared Releases"
+            url = "https://maven.bawnorton.com/releases"
+        }
+        maven {
+            name = "MixinSquared Mirrors"
+            url = "https://maven.enjarai.dev/mirrors"
         }
     }
 
