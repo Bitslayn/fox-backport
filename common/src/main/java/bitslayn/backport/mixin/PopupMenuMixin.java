@@ -5,14 +5,16 @@ import com.llamalad7.mixinextras.expression.Expression;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.authlib.GameProfile;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.Vec3;
 import org.figuramc.figura.FiguraMod;
 import org.figuramc.figura.avatar.Avatar;
 import org.figuramc.figura.avatar.AvatarManager;
@@ -123,6 +125,31 @@ public abstract class PopupMenuMixin implements PopupMenuAccessor {
         return id;
     }
 
+
+    // defuse the original conditions and code
+    @Definition(id = "minecraft", local = @Local(type = Minecraft.class, name = "minecraft"))
+    @Definition(id = "player", field = "Lnet/minecraft/client/Minecraft;player:Lnet/minecraft/client/player/LocalPlayer;")
+    @Expression("minecraft.player == null")
+    @WrapOperation(method = "render", at = @At("MIXINEXTRAS:EXPRESSION"))
+    private static boolean removeOriginalCheck1(Object left, Object right, Operation<Boolean> original) {
+        return false;
+    }
+
+    @WrapOperation(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;isInvisibleTo(Lnet/minecraft/world/entity/player/Player;)Z"))
+    private static boolean removeOriginalCheck2(Entity instance, Player player, Operation<Boolean> original) {
+        return false;
+    }
+
+    @WrapOperation(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;getPosition(F)Lnet/minecraft/world/phys/Vec3;"))
+    private static Vec3 removeOriginalCheck3(Entity instance, float d0, Operation<Vec3> original) {
+        return Vec3.ZERO;
+    }
+
+    @WrapOperation(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;getBbHeight()F"))
+    private static float removeOriginalCheck4(Entity instance, Operation<Float> original) {
+        return 0f;
+    }
+
     // rendering
     @ModifyVariable(
             name = "vec",
@@ -147,11 +174,11 @@ public abstract class PopupMenuMixin implements PopupMenuAccessor {
     // name
     @Definition(id = "entity", field = "Lorg/figuramc/figura/gui/PopupMenu;entity:Lnet/minecraft/world/entity/Entity;")
     @Definition(id = "getName", method = "Lnet/minecraft/world/entity/Entity;getName()Lnet/minecraft/network/chat/Component;")
-    @Expression("entity.getName().?()")
-    @ModifyExpressionValue(method = "render", at = @At("MIXINEXTRAS:EXPRESSION"))
-    private static MutableComponent alternateName(MutableComponent original) {
+    @Expression("@(entity.getName()).?()")
+    @WrapOperation(method = "render", at = @At("MIXINEXTRAS:EXPRESSION"))
+    private static Component alternateName(Entity instance, Operation<Component> original) {
         Avatar avatar = AvatarManager.getAvatarForPlayer(id);
-        return avatar != null ? Component.literal(avatar.entityName) : original;
+        return avatar != null ? Component.literal(avatar.entityName) : original.call(instance);
     }
 
     // clean up
