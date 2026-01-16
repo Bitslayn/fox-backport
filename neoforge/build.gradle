@@ -1,3 +1,5 @@
+import org.gradle.api.attributes.java.TargetJvmVersion
+
 plugins {
     id 'com.github.johnrengelman.shadow'
 }
@@ -13,6 +15,14 @@ configurations {
     compileClasspath.extendsFrom common
     runtimeClasspath.extendsFrom common
     developmentForge.extendsFrom common
+}
+
+def javaTarget = Integer.parseInt(target_java)
+
+configurations.configureEach {
+    attributes {
+        attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, javaTarget)
+    }
 }
 
 dependencies {

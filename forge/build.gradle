@@ -1,3 +1,5 @@
+import org.gradle.api.attributes.java.TargetJvmVersion
+
 plugins {
     id 'com.github.johnrengelman.shadow'
 }
@@ -19,6 +21,14 @@ configurations {
     compileClasspath.extendsFrom common
     runtimeClasspath.extendsFrom common
     developmentForge.extendsFrom common
+}
+
+def javaTarget = Integer.parseInt(target_java)
+
+configurations.configureEach {
+    attributes {
+        attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, javaTarget)
+    }
 }
 
 dependencies {
@@ -46,7 +56,6 @@ processResources {
     injectProperties.put 'version', project.version
     injectProperties.put 'minecraft_range_forge', minecraft_range_forge
     injectProperties.put 'forge_minimum', forge_minimum
-    injectProperties.put 'forge_maximum', forge_maximum
     injectProperties.forEach { k, v -> inputs.property(k.toString(), v.toString()) }
 
     filesMatching('META-INF/mods.toml') {

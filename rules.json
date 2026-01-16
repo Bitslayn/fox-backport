@@ -4,12 +4,12 @@
     "fabric_api": "0.86.1",
     "forge": "47.2.5",
     "forge_min": "36",
-    "forge_max": "59",
     "neoforge": "20.2.93",
     "neoforge_range": "[20.2,)",
     "label": "",
     "commonSrcSets": "channel1opt1;channel2opt1",
-    "figura_is_snapshot": false
+    "figura_is_snapshot": false,
+    "target_java": 17
   },
   "variants": {
     "fabric_forge_1": {
@@ -17,7 +17,6 @@
       "fabric_range": ">=1.20.1 <=1.20.4",
       "forge_range": "[1.20.1,1.20.4]",
       "forge_min": "36",
-      "forge_max": "50",
       "is_fabric": true,
       "is_forge": true,
       "is_neo": false,
@@ -31,7 +30,24 @@
       "is_fabric": false,
       "is_forge": false,
       "is_neo": true,
-      "commonSrcSets": "channel1opt1;channel2opt1"
+      "commonSrcSets": "channel1opt1;channel2opt1",
+      "label": "+split1"
+    },
+    "all_2": {
+      "fabric_api": "0.100.8",
+      "forge": "50.2.0",
+      "neoforge": "20.6.139",
+      "minecraft_target": "1.20.6",
+      "fabric_range": "1.20.6",
+      "forge_range": "[1.20.6]",
+      "neoforge_range": "[20.6,)",
+      "forge_min": "50",
+      "is_fabric": true,
+      "is_forge": true,
+      "is_neo": true,
+      "label": "+split2",
+      "commonSrcSets": "channel1opt1;channel2opt2",
+      "target_java": 21
     }
   }
 }
