@@ -2,6 +2,23 @@ architectury {
     common enabled_platforms.split(',')
 }
 
+def additionalSrc = commonSrcSets.split(";")
+
+sourceSets {
+    main {
+        java {
+            for (dir in additionalSrc) {
+                if (!dir.isEmpty())
+                    srcDirs += file("src/main/$dir")
+            }
+        }
+    }
+}
+
+sourcesJar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
 def figura_attach = (figura_is_snapshot == "True") ? "-SNAPSHOT" : ""
 
 dependencies {

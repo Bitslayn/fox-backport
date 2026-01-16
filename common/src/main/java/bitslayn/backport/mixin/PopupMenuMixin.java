@@ -1,23 +1,28 @@
 package bitslayn.backport.mixin;
 
+import bitslayn.backport.availability.ItemCompat;
+import bitslayn.backport.availability.VersionCompat;
 import com.llamalad7.mixinextras.expression.Definition;
 import com.llamalad7.mixinextras.expression.Expression;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.authlib.GameProfile;
+import com.mojang.blaze3d.platform.Window;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.phys.Vec3;
 import org.figuramc.figura.FiguraMod;
 import org.figuramc.figura.avatar.Avatar;
 import org.figuramc.figura.avatar.AvatarManager;
+import org.figuramc.figura.avatar.Badges;
+import org.figuramc.figura.config.Configs;
 import org.figuramc.figura.gui.FiguraToast;
 import org.figuramc.figura.gui.PopupMenu;
 import org.figuramc.figura.math.vector.FiguraVec3;
@@ -28,12 +33,13 @@ import org.figuramc.figura.permissions.Permissions;
 import org.figuramc.figura.utils.FiguraIdentifier;
 import org.figuramc.figura.utils.FiguraText;
 import org.figuramc.figura.utils.MathUtils;
+import org.figuramc.figura.utils.ui.UIHelper;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.ArrayList;
@@ -55,6 +61,37 @@ public abstract class PopupMenuMixin implements PopupMenuAccessor {
 
     @Shadow(remap = false)
     private static UUID id;
+
+    @Shadow
+    @Final
+    private static int LENGTH;
+
+    @Shadow
+    @Final
+    private static FiguraIdentifier ICONS;
+
+    @Shadow
+    private static int index;
+
+    @Shadow
+    @Final
+    private static List<Pair<Component, Consumer<UUID>>> BUTTONS;
+
+    @Shadow
+    @Final
+    private static FiguraIdentifier BACKGROUND;
+
+    @Shadow
+    @Final
+    private static MutableComponent ERROR_WARN;
+
+    @Shadow
+    @Final
+    private static MutableComponent VERSION_WARN;
+
+    @Shadow
+    @Final
+    private static MutableComponent PERMISSION_WARN;
 
     @Definition(id = "BUTTONS", field = "Lorg/figuramc/figura/gui/PopupMenu;BUTTONS:Ljava/util/List;", remap = false)
     @Definition(id = "of", method = "Ljava/util/List;of(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/util/List;", remap = false)
@@ -78,107 +115,118 @@ public abstract class PopupMenuMixin implements PopupMenuAccessor {
         return writable;
     }
 
-    // it's easier to target the start of the method and copy the if statement
-    // than inject after the if statement
-    @Inject(method = "render", at = @At("HEAD"), cancellable = true)
-    private static void attribution(GuiGraphics gui, CallbackInfo ci) {
-        if (!isEnabled()) {
-            ci.cancel();
-            return;
-        }
-        Minecraft mc = Minecraft.getInstance();
+    /**
+     * @author penguinencounter
+     * @reason it's just so much easier than the alternative of 9 separate wrappers to prevent it from dying
+     */
+    @Overwrite
+    public static void render(GuiGraphics gui) {
+        if (!isEnabled()) return;
+
+        Minecraft minecraft = Minecraft.getInstance();
+
         if (entity != null) {
             id = entity.getUUID();
-            if (mc.player == null || (entity.isInvisibleTo(mc.player) && entity != mc.player)) {
+            if (minecraft.player == null || (entity.isInvisibleTo(minecraft.player) && entity != minecraft.player)) {
                 entity = null;
                 id = null;
-                ci.cancel();
+                return;
             }
         } else if (skull != null) {
-            GameProfile profile = skull.getOwnerProfile();
+            GameProfile profile = ItemCompat.getOwnerProfile(skull);
             id = profile != null ? profile.getId() : null;
             if (id == null || skull.isRemoved() || AvatarManager.getAvatarForPlayer(id) == null) {
                 skull = null;
                 id = null;
-                ci.cancel();
+                return;
             }
         } else {
             id = null;
-            ci.cancel();
+            return;
         }
-    }
 
-    // and now we have to skip past all the original code
-    @Definition(id = "entity", field = "Lorg/figuramc/figura/gui/PopupMenu;entity:Lnet/minecraft/world/entity/Entity;")
-    @Expression("entity == null")
-    @ModifyExpressionValue(method = "render", at = @At("MIXINEXTRAS:EXPRESSION"))
-    private static boolean bypass1(boolean original) {
-        return false;
-    }
+        RenderSystem.disableDepthTest();
+        PoseStack pose = gui.pose();
+        pose.pushPose();
 
-    // we already know the ID from the attribution injection, so we want to not change it here
-    @Redirect(method = "render", at = @At(
-            value = "INVOKE",
-            target = "Lnet/minecraft/world/entity/Entity;getUUID()Ljava/util/UUID;"
-    ))
-    private static UUID bypass2(Entity instance) {
-        return id;
-    }
-
-
-    // defuse the original conditions and code
-    @Definition(id = "minecraft", local = @Local(type = Minecraft.class, name = "minecraft"))
-    @Definition(id = "player", field = "Lnet/minecraft/client/Minecraft;player:Lnet/minecraft/client/player/LocalPlayer;")
-    @Expression("minecraft.player == null")
-    @WrapOperation(method = "render", at = @At("MIXINEXTRAS:EXPRESSION"))
-    private static boolean removeOriginalCheck1(Object left, Object right, Operation<Boolean> original) {
-        return false;
-    }
-
-    @WrapOperation(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;isInvisibleTo(Lnet/minecraft/world/entity/player/Player;)Z"))
-    private static boolean removeOriginalCheck2(Entity instance, Player player, Operation<Boolean> original) {
-        return false;
-    }
-
-    @WrapOperation(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;getPosition(F)Lnet/minecraft/world/phys/Vec3;"))
-    private static Vec3 removeOriginalCheck3(Entity instance, float d0, Operation<Vec3> original) {
-        return Vec3.ZERO;
-    }
-
-    @WrapOperation(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;getBbHeight()F"))
-    private static float removeOriginalCheck4(Entity instance, Operation<Float> original) {
-        return 0f;
-    }
-
-    // rendering
-    @ModifyVariable(
-            name = "vec",
-            method = "render",
-            at = @At(
-                    value = "STORE",
-                    ordinal = 0
-            )
-    )
-    private static FiguraVec4 positioning(FiguraVec4 value, @Local(name = "minecraft") Minecraft minecraft) {
+        // world to screen space
+        FiguraVec4 vec;
         if (entity != null) {
-            FiguraVec3 worldPos = FiguraVec3.fromVec3(entity.getPosition(minecraft.getFrameTime()));
+            FiguraVec3 worldPos = FiguraVec3.fromVec3(entity.getPosition(VersionCompat.getFrameTime(minecraft)));
             worldPos.add(0f, entity.getBbHeight() + 0.1f, 0f);
-            return MathUtils.worldToScreenSpace(worldPos);
+            vec = MathUtils.worldToScreenSpace(worldPos);
         } else {
             FiguraVec3 blockPos = FiguraVec3.fromBlockPos(skull.getBlockPos());
             blockPos.add(0.5, 0.6, 0.5);
-            return MathUtils.worldToScreenSpace(blockPos);
+            vec = MathUtils.worldToScreenSpace(blockPos);
         }
-    }
 
-    // name
-    @Definition(id = "entity", field = "Lorg/figuramc/figura/gui/PopupMenu;entity:Lnet/minecraft/world/entity/Entity;")
-    @Definition(id = "getName", method = "Lnet/minecraft/world/entity/Entity;getName()Lnet/minecraft/network/chat/Component;")
-    @Expression("@(entity.getName()).?()")
-    @WrapOperation(method = "render", at = @At("MIXINEXTRAS:EXPRESSION"))
-    private static Component alternateName(Entity instance, Operation<Component> original) {
+        if (vec.z < 1) return; // too close
+
+        Window window = minecraft.getWindow();
+        double w = window.getGuiScaledWidth();
+        double h = window.getGuiScaledHeight();
+        double s = Configs.POPUP_SCALE.value * Math.max(Math.min(window.getHeight() * 0.035 / vec.w * (1 / window.getGuiScale()), Configs.POPUP_MAX_SIZE.value), Configs.POPUP_MIN_SIZE.value);
+
+        pose.translate((vec.x + 1) / 2 * w, (vec.y + 1) / 2 * h, -100);
+        pose.scale((float) (s * 0.5), (float) (s * 0.5), 1);
+
+        // background
+        int width = LENGTH * 18;
+
+        UIHelper.enableBlend();
+        int frame = Configs.REDUCED_MOTION.value ? 0 : (int) ((FiguraMod.ticks / 5f) % 4);
+        gui.blit(BACKGROUND, width / -2, -24, width, 26, 0, frame * 26, width, 26, width, 104);
+
+        // icons
+        pose.translate(0f, 0f, -2f);
+        UIHelper.enableBlend();
+        for (int i = 0; i < LENGTH; i++)
+            gui.blit(ICONS, width / -2 + (18 * i), -24, 18, 18, 18 * i, i == index ? 18 : 0, 18, 18, width, 36);
+
+        // texts
+        Font font = minecraft.font;
+
+        Component title = BUTTONS.get(index).getFirst();
+
+        PermissionPack tc = PermissionManager.get(id);
+        MutableComponent permissionName = tc.getCategoryName().append(tc.hasChanges() ? "*" : "");
+
         Avatar avatar = AvatarManager.getAvatarForPlayer(id);
-        return avatar != null ? Component.literal(avatar.entityName) : original.call(instance);
+        MutableComponent name = avatar != null ? Component.literal(avatar.entityName) : entity.getName().copy();
+
+        boolean error = false;
+        boolean version = false;
+        boolean noPermissions = false;
+
+        Component badges = Badges.fetchBadges(id);
+        if (!badges.getString().isEmpty())
+            name.append(" ").append(badges);
+
+        if (avatar != null) {
+            error = avatar.scriptError;
+            version = avatar.versionStatus > 0;
+            noPermissions = !avatar.noPermissions.isEmpty();
+        }
+
+        // render texts
+        UIHelper.renderOutlineText(gui, font, name, -font.width(name) / 2, -36, 0xFFFFFF, 0x202020);
+
+        pose.scale(0.5f, 0.5f, 0.5f);
+        pose.translate(0f, 0f, -1f);
+
+        UIHelper.renderOutlineText(gui, font, permissionName, -font.width(permissionName) / 2, -54, 0xFFFFFF, 0x202020);
+        gui.drawString(font, title, -width + 4, -12, 0xFFFFFF);
+
+        if (error)
+            UIHelper.renderOutlineText(gui, font, ERROR_WARN, -font.width(ERROR_WARN) / 2, 0, 0xFFFFFF, 0x202020);
+        if (version)
+            UIHelper.renderOutlineText(gui, font, VERSION_WARN, -font.width(VERSION_WARN) / 2, error ? font.lineHeight : 0, 0xFFFFFF, 0x202020);
+        if (noPermissions)
+            UIHelper.renderOutlineText(gui, font, PERMISSION_WARN, -font.width(PERMISSION_WARN) / 2, (error ? font.lineHeight : 0) + (version ? font.lineHeight : 0), 0xFFFFFF, 0x202020);
+
+        // finish rendering
+        pose.popPose();
     }
 
     // clean up
