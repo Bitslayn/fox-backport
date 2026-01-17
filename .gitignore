@@ -120,3 +120,5 @@ runs/
 
 
 __pycache__/
+mr-info.json
+mr-changelog.md
