@@ -133,8 +133,7 @@ public abstract class PopupMenuMixin implements PopupMenuAccessor {
                 return;
             }
         } else if (skull != null) {
-            GameProfile profile = ItemCompat.getOwnerProfile(skull);
-            id = profile != null ? profile.getId() : null;
+            id = ItemCompat.getOwnerProfileId(skull);
             if (id == null || skull.isRemoved() || AvatarManager.getAvatarForPlayer(id) == null) {
                 skull = null;
                 id = null;

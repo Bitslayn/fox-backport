@@ -7,7 +7,7 @@ import java.util.UUID;
 public class ItemCompat {
     public static UUID getOwnerProfileId(SkullBlockEntity $this) {
         if ($this.getOwnerProfile() != null) {
-            return $this.getOwnerProfile().gameProfile().getId();
+            return $this.getOwnerProfile().partialProfile().id();
         }
         return null;
     }
