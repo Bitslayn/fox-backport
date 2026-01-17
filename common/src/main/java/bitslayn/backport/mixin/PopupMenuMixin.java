@@ -1,6 +1,7 @@
 package bitslayn.backport.mixin;
 
 import bitslayn.backport.availability.GraphicsCompat;
+import bitslayn.backport.availability.IPoseStack;
 import bitslayn.backport.availability.ItemCompat;
 import com.llamalad7.mixinextras.expression.Definition;
 import com.llamalad7.mixinextras.expression.Expression;
@@ -9,7 +10,6 @@ import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.mojang.authlib.GameProfile;
 import com.mojang.blaze3d.platform.Window;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -146,7 +146,7 @@ public abstract class PopupMenuMixin implements PopupMenuAccessor {
         }
 
         GraphicsCompat.disableDepthTest();
-        PoseStack pose = gui.pose();
+        IPoseStack pose = GraphicsCompat.pose(gui);
         pose.pushPose();
 
         // world to screen space
@@ -166,9 +166,9 @@ public abstract class PopupMenuMixin implements PopupMenuAccessor {
         Window window = minecraft.getWindow();
         double w = window.getGuiScaledWidth();
         double h = window.getGuiScaledHeight();
-        double s = Configs.POPUP_SCALE.value * Math.max(Math.min(window.getHeight() * 0.035 / vec.w * (1 / window.getGuiScale()), Configs.POPUP_MAX_SIZE.value), Configs.POPUP_MIN_SIZE.value);
+        double s = Configs.POPUP_SCALE.value * Math.max(Math.min(window.getHeight() * 0.035 / vec.w * (1d / window.getGuiScale()), Configs.POPUP_MAX_SIZE.value), Configs.POPUP_MIN_SIZE.value);
 
-        pose.translate((vec.x + 1) / 2 * w, (vec.y + 1) / 2 * h, -100);
+        pose.translate((float) ((vec.x + 1) / 2 * w), (float) ((vec.y + 1) / 2 * h), -100f);
         pose.scale((float) (s * 0.5), (float) (s * 0.5), 1);
 
         // background
@@ -216,7 +216,7 @@ public abstract class PopupMenuMixin implements PopupMenuAccessor {
         pose.translate(0f, 0f, -1f);
 
         UIHelper.renderOutlineText(gui, font, permissionName, -font.width(permissionName) / 2, -54, 0xFFFFFF, 0x202020);
-        gui.drawString(font, title, -width + 4, -12, 0xFFFFFF);
+        gui.drawString(font, title, -width + 4, -12, GraphicsCompat.adjustColor(0xFFFFFF));
 
         if (error)
             UIHelper.renderOutlineText(gui, font, ERROR_WARN, -font.width(ERROR_WARN) / 2, 0, 0xFFFFFF, 0x202020);

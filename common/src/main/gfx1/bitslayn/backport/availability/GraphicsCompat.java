@@ -23,4 +23,12 @@ public class GraphicsCompat {
     public static void disableDepthTest() {
         RenderSystem.disableDepthTest();
     }
+
+    public static IPoseStack pose(GuiGraphics gui) {
+        return new PoseStackImpl(gui.pose());
+    }
+
+    public static int adjustColor(int color) {
+        return color;
+    }
 }

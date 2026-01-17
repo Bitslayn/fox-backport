@@ -1,6 +1,6 @@
 package bitslayn.backport.availability;
 
-import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.opengl.GlStateManager;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
@@ -11,6 +11,14 @@ public class GraphicsCompat {
     }
 
     public static void disableDepthTest() {
-        RenderSystem.disableDepthTest();
+        GlStateManager._disableDepthTest();
+    }
+
+    public static IPoseStack pose(GuiGraphics gui) {
+        return new PoseStackImpl(gui.pose());
+    }
+
+    public static int adjustColor(int color) {
+        return color;
     }
 }
