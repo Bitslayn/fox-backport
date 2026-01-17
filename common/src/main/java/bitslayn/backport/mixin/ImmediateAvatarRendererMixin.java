@@ -7,28 +7,27 @@ import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import org.figuramc.figura.math.vector.FiguraVec3;
 import org.figuramc.figura.model.FiguraModelPart;
 import org.figuramc.figura.model.PartCustomization;
-import org.figuramc.figura.model.rendering.ImmediateAvatarRenderer;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(ImmediateAvatarRenderer.class)
+@Pseudo
+@Mixin(targets = {"org.figuramc.figura.model.rendering.ImmediateAvatarRenderer", "org.figuramc.figura.model.rendering.ImmediateFiguraRenderer"})
 public class ImmediateAvatarRendererMixin {
     @Shadow
     @Final
     protected PartCustomization.PartCustomizationStack customizationStack;
 
+    // FiguraVec3 pivot = custom.getPivot().copy().add(custom.getOffsetPivot());
     @Definition(id = "getPivot", method = "Lorg/figuramc/figura/model/PartCustomization;getPivot()Lorg/figuramc/figura/math/vector/FiguraVec3;")
     @Definition(id = "add", method = "Lorg/figuramc/figura/math/vector/FiguraVec3;add(Lorg/figuramc/figura/math/vector/FiguraVec3;)Lorg/figuramc/figura/math/vector/FiguraVec3;")
-    @Definition(id = "pivot", local = @Local(type = FiguraVec3.class, name = "pivot"))
-    @Expression("pivot = ?.getPivot().?().add(?)")
+    @Expression("?.getPivot().?().add(?)")
     @Inject(method = "renderPart", at = @At("MIXINEXTRAS:EXPRESSION"))
     private void preCalculateLight(FiguraModelPart part,
                                    int[] remainingComplexity,
@@ -43,11 +42,7 @@ public class ImmediateAvatarRendererMixin {
 
     @Inject(
             method = "renderPart",
-            at = @At(value = "INVOKE", target = "Ljava/util/Collection;iterator()Ljava/util/Iterator;"),
-            slice = @Slice(
-                    from = @At(value = "INVOKE", target = "Lorg/figuramc/figura/model/rendering/ImmediateAvatarRenderer;renderPivot(Lorg/figuramc/figura/model/FiguraModelPart;Lorg/figuramc/figura/model/PartCustomization;)V"),
-                    to = @At(value = "INVOKE", target = "Lorg/figuramc/figura/model/rendering/ImmediateAvatarRenderer;savePivotTransform(Lorg/figuramc/figura/model/ParentType;Lorg/figuramc/figura/model/PartCustomization;)V")
-            )
+            at = @At(value = "INVOKE", target = "Ljava/util/Collection;iterator()Ljava/util/Iterator;")
     )
     private void usePreCalculatedLight(FiguraModelPart part,
                                        int[] remainingComplexity,
