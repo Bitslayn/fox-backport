@@ -1,7 +1,7 @@
 package bitslayn.backport.mixin;
 
+import bitslayn.backport.availability.GraphicsCompat;
 import bitslayn.backport.availability.ItemCompat;
-import bitslayn.backport.availability.VersionCompat;
 import com.llamalad7.mixinextras.expression.Definition;
 import com.llamalad7.mixinextras.expression.Expression;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
@@ -9,7 +9,6 @@ import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.mojang.authlib.GameProfile;
 import com.mojang.blaze3d.platform.Window;
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.client.Minecraft;
@@ -25,6 +24,7 @@ import org.figuramc.figura.avatar.Badges;
 import org.figuramc.figura.config.Configs;
 import org.figuramc.figura.gui.FiguraToast;
 import org.figuramc.figura.gui.PopupMenu;
+import org.figuramc.figura.lua.api.ClientAPI;
 import org.figuramc.figura.math.vector.FiguraVec3;
 import org.figuramc.figura.math.vector.FiguraVec4;
 import org.figuramc.figura.permissions.PermissionManager;
@@ -62,22 +62,22 @@ public abstract class PopupMenuMixin implements PopupMenuAccessor {
     @Shadow(remap = false)
     private static UUID id;
 
-    @Shadow
+    @Shadow(remap = false)
     @Final
     private static int LENGTH;
 
-    @Shadow
+    @Shadow(remap = false)
     @Final
     private static FiguraIdentifier ICONS;
 
-    @Shadow
+    @Shadow(remap = false)
     private static int index;
 
-    @Shadow
+    @Shadow(remap = false)
     @Final
     private static List<Pair<Component, Consumer<UUID>>> BUTTONS;
 
-    @Shadow
+    @Shadow(remap = false)
     @Final
     private static FiguraIdentifier BACKGROUND;
 
@@ -145,14 +145,14 @@ public abstract class PopupMenuMixin implements PopupMenuAccessor {
             return;
         }
 
-        RenderSystem.disableDepthTest();
+        GraphicsCompat.disableDepthTest();
         PoseStack pose = gui.pose();
         pose.pushPose();
 
         // world to screen space
         FiguraVec4 vec;
         if (entity != null) {
-            FiguraVec3 worldPos = FiguraVec3.fromVec3(entity.getPosition(VersionCompat.getFrameTime(minecraft)));
+            FiguraVec3 worldPos = FiguraVec3.fromVec3(entity.getPosition((float) ClientAPI.getFrameTime()));
             worldPos.add(0f, entity.getBbHeight() + 0.1f, 0f);
             vec = MathUtils.worldToScreenSpace(worldPos);
         } else {
@@ -176,13 +176,13 @@ public abstract class PopupMenuMixin implements PopupMenuAccessor {
 
         UIHelper.enableBlend();
         int frame = Configs.REDUCED_MOTION.value ? 0 : (int) ((FiguraMod.ticks / 5f) % 4);
-        gui.blit(BACKGROUND, width / -2, -24, width, 26, 0, frame * 26, width, 26, width, 104);
+        GraphicsCompat.blit(gui, BACKGROUND, width / -2, -24, width, 26, 0, frame * 26, width, 26, width, 104);
 
         // icons
         pose.translate(0f, 0f, -2f);
         UIHelper.enableBlend();
         for (int i = 0; i < LENGTH; i++)
-            gui.blit(ICONS, width / -2 + (18 * i), -24, 18, 18, 18 * i, i == index ? 18 : 0, 18, 18, width, 36);
+            GraphicsCompat.blit(gui, ICONS, width / -2 + (18 * i), -24, 18, 18, 18 * i, i == index ? 18 : 0, 18, 18, width, 36);
 
         // texts
         Font font = minecraft.font;
