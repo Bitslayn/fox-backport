@@ -48,5 +48,5 @@ Adds a button to the popup menu that cycles the volume through three different v
 ## Publishing
 1. Delete the `fabric/build/libs`, `forge/build/libs`, and `neoforge/build/libs` folders.
 2. Close IntelliJ IDEA, or turn off auto-sync (gradle tool window > settings button > auto-sync settings... > uncheck the box)
-3. Run `python generate.py build --version 1.2.3`. This will take a while as it builds the project 7 times (one for each version split). (adjust version number as needed)
+3. Run `python generate.py build --version <mod_semver>`. This will take a while as it builds the project 7 times (one for each version split). (adjust version number as needed)
 4. Run `python publish.py` to upload to Modrinth.
