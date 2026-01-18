@@ -2,15 +2,18 @@
   "schemaVersion": 1,
   "id": "foxbackport",
   "version": "${version}",
-  "name": "FOXBackport",
-  "description": "Miscellaneous patches for Figura 0.1.5",
+  "name": "FOX's Misc Figura Backport",
+  "description": "Backports popular changes and fixes from Figura 0.1.6",
   "authors": [
+    "Bitslayn",
     "PenguinEncounter"
   ],
   "contact": {
-    "homepage": ""
+    "sources": "${git_source}",
+    "issues": "${git_issues}"
   },
   "license": "MIT",
+  "icon": "assets/foxbackport/icon.png",
   "environment": "client",
   "entrypoints": {
     "client": [

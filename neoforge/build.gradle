@@ -50,6 +50,8 @@ processResources {
     injectProperties.put 'version', project.version
     injectProperties.put 'minecraft_range_forge', minecraft_range_forge
     injectProperties.put 'neoforge_range', neoforge_range
+    injectProperties.put 'git_source', git_source
+    injectProperties.put 'git_issues', git_issues
     injectProperties.forEach { k, v -> inputs.property(k.toString(), v.toString()) }
 
     Map<String, String> renames = new HashMap<>()

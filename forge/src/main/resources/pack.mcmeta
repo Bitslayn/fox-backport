@@ -1,6 +1,6 @@
 {
   "pack": {
-    "description": "foxbackport resources",
+    "description": "${mod_name}",
     "pack_format": 15
   }
 }

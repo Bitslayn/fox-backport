@@ -7,6 +7,7 @@
 org.gradle.jvmargs=-Xmx4G
 org.gradle.parallel=true
 org.gradle.caching=true
+
 # Mod properties
 mod_version={{ version }}{{ label }}
 maven_group=bitslayn
@@ -17,10 +18,15 @@ is_forge={{ is_forge }}
 is_neo={{ is_neo }}
 target_java={{ target_java }}
 
+# Git
+git_source=https://github.com/Bitslayn/fox-backport
+git_issues=https://github.com/Bitslayn/fox-backport/issues
+
 # Minecraft properties
 minecraft_version={{ minecraft_target }}
 minecraft_range_fabric={{ fabric_range }}
 minecraft_range_forge={{ forge_range }}
+
 # Dependencies
 figura=0.1.5
 figura_is_snapshot={{ figura_is_snapshot }}

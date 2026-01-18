@@ -1,18 +1,16 @@
 modLoader = "javafml"
 loaderVersion = "[1,)"
-#issueTrackerURL = ""
+issueTrackerURL = "${git_issues}"
 license = "MIT"
 
 [[mods]]
 modId = "foxbackport"
 version = "${version}"
-displayName = "FOXBackport"
-authors = ""
+displayName = "FOX's Misc Figura Backport"
+authors = "Bitslayn, PenguinEncounter"
 displayTest = "IGNORE_ALL_VERSION"
-description = '''
-
-'''
-#logoFile = ""
+description = "Backports popular changes and fixes from Figura 0.1.6"
+logoFile = "assets/foxbackport/icon.png"
 
 [[dependencies.foxbackport]]
 modId = "forge"
