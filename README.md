@@ -25,7 +25,7 @@ Fixes a bug causing render tasks, such as ItemTasks or SpriteTasks to become dar
 
 A side effect of this bug is that tasks don't become properly shaded by the environment. This change fixes both these issues.
 
-<img width="512" alt="image" src="https://github.com/user-attachments/assets/5b6afd20-58da-4400-8328-e902f88ac001" />
+<img width="512" alt="image" src="https://github.com/user-attachments/assets/be2f96b3-b808-4f3a-a6ac-31a6fb6a359b" />
 
 ## Popup menu usable on skulls
 
