@@ -2,7 +2,7 @@
 
 # Features
 
-Backports popular changes and fixes I've written for Figura 0.1.6 such as:
+Backports popular changes and fixes I've written for Figura 0.1.6 to Figura 0.1.5 such as:
 
 * Searchable offline avatars https://github.com/FiguraMC/Figura/pull/449
 * Render task fixes https://github.com/FiguraMC/Figura/pull/433 & https://github.com/FiguraMC/Figura/pull/462
