@@ -121,11 +121,9 @@ counters = defaultdict(int)
 
 
 def publish(session: requests.Session, project: str, file: Path, version: str, modloader: str, mc: list[str], changelog: str | None):
-    counters[modloader] += 1
-    n = counters[modloader]
     publish_info = {
-        "version_number": f"{version}+{modloader}{n}",
-        "name": f"v{version} {modloader} {', '.join(mc)}",
+        "version_number": f"{version}+{mc[0]}-{modloader}",
+        "name": f"v{version} {modloader.capitalize()} {', '.join(mc)}",
         "dependencies": [],
         "game_versions": mc,
         "version_type": "release",
