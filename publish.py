@@ -123,11 +123,11 @@ counters = defaultdict(int)
 def publish(session: requests.Session, project: str, file: Path, version: str, modloader: str, mc: list[str], changelog: str | None):
     publish_info = {
         "version_number": f"{version}+{mc[0]}-{modloader}",
-        "name": f"v{version} {modloader.capitalize()} {', '.join(mc)}",
+        "name": f"FOX's Backport v{version} {modloader.capitalize()}",
         "dependencies": [],
         "game_versions": mc,
         "version_type": "release",
-        "loaders": [modloader],
+        "loaders": ([modloader], [modloader, "quilt"])[modloader == "fabric"],
         "featured": False,
         "project_id": project,
         # "status": "listed",
