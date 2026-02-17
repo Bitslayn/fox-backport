@@ -17,7 +17,7 @@ Figura for whatever reason explicitly prevented offline avatars from being searc
 
 This change allows for offline avatars to be searchable in the permissions tab.
 
-<img width="512" alt="image" src="https://github.com/user-attachments/assets/66d6dea8-a9f2-453a-b60f-2005d925d429" />
+<img width="512" alt="image" src="https://github.com/user-attachments/assets/34531828-3d10-41af-9ec9-0f664c37bafe" />
 
 ## Render task fixes
 
